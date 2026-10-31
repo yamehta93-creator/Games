@@ -1,44 +1,68 @@
-# Lumen Drift
+# Legends of the Elements + Lumen Drift
 
-An original neon survival arcade game built with React, TypeScript, and HTML Canvas. The supplied Claude artifact could not be inspected because the environment proxy returned HTTP 403; this game is an original design.
+A browser game collection built with React, TypeScript, Vite, and Three.js / Canvas. The default page is **Legends of the Elements**, a playable, stylized 3D fan adventure inspired by Xiaolin Showdown. **Lumen Drift** remains available at `arcade.html`.
 
-## Play
+## Play the 3D adventure
 
-Collect mint crystals, avoid pink hazards, and survive with three lives. Pick up crystals within three seconds of one another to grow your score multiplier to 5×. Every 500 points advances a sector, up to sector 12; hazards get faster and more frequent. Dash gives a brief burst of speed and immunity, with a 2.6-second cooldown. Best scores are saved in your current browser when storage is available.
+Lead Omi and AI companions Kimiko, Raimundo, and Clay through three chapters:
 
-- Desktop: WASD or arrow keys to move; Space to dash; P or Esc to pause.
-- Mobile: hold and drag anywhere inside the arena to steer; tap DASH with your other finger to escape.
-- Use the sound button to mute synthesized effects. Sound begins after starting a run.
-- The game pauses when the browser loses focus. Resume using the on-screen button.
-- After losing three lives, choose **Drift again**.
+1. **The Jade Awakening** — young trainees defend the monastery and face the Iron Warden.
+2. **Guardians of the Ember** — the team becomes adult guardians with increased health and power, and faces the Ash Sentinel.
+3. **The Last Showdown** — elemental masters confront the Eclipse Sovereign.
 
-## Get a public link without installing developer tools
+Defeat every raider and guardian, collect healing crystals, and enter the glowing spirit gate at the **north end of the stone path**. Omi must survive; stand near a fallen AI companion for three seconds to revive them. Red floor rings warn of incoming attacks. Bosses attack faster below half health.
 
-### Fastest: Netlify Drop
+### Controls
 
-1. Download the prepared `lumen-drift-web.zip` supplied with this project.
-2. Extract the ZIP using your device’s built-in archive support. The resulting folder contains `index.html` and an `assets` folder.
-3. Sign in to a free Netlify account and open https://app.netlify.com/drop .
-4. Drag that extracted folder onto the upload area (or use the upload chooser). Upload the folder containing `index.html`, not the source project.
-5. Netlify supplies a public HTTPS address ending in `.netlify.app`. Open it on your phone or computer to play and share it with friends. You can rename the site in Netlify settings.
+- **WASD / arrows**: movement relative to the camera.
+- **Hold J / Strike button**: attack the closest enemy in range.
+- **E / Water surge**: area damage, freeze, and self-heal; cooldown improves with mastery.
+- **Space / Dodge**: burst movement with brief invulnerability.
+- **U / Upgrade team / hero card**: pause and manage upgrades.
+- **1 / 2 / 3**: balanced, assault, or guard tactic.
+- **P / Escape**: pause / resume. Losing browser focus also pauses.
+- **Mobile**: left virtual stick to move; right-hand Strike, Water surge, and Dodge buttons.
+- Top-right sound and fullscreen controls are available where supported.
 
-No terminal, Node.js installation, backend, API key, or database is needed. Netlify account limits and free-plan terms apply. A hosting upload is still required; this project has not been published automatically.
+### Team strategy
 
-### Vercel or Netlify with automatic updates
+- **Omi / water**: freezes enemies and heals himself. Frozen enemies cannot attack or move.
+- **Kimiko / fire**: area attacks; deals 35% bonus damage against water-frozen enemies.
+- **Raimundo / wind**: area healing bursts; mastery also adds a passive healing breeze.
+- **Clay / earth**: nearby damage protection and temporary team shielding.
 
-Once these source files are uploaded to your GitHub repository using GitHub’s web interface (or pushed from this cloud workspace), import that repository at https://vercel.com/new or Netlify’s “Import an existing project”. Select Vite, build command `npm run build`, and output directory `dist`. Leave the root directory at the repository root. Configuration files for both hosts are included. The host builds the game in the cloud and returns a public HTTPS URL; future repository updates redeploy automatically.
+Spend spirit shards on damage, health, or role mastery for any teammate. Shards are awarded for defeats and restored relics. Each upgrade costs more than the last and is capped at four levels. Assault increases companion damage and pursuit range; Guard strengthens Clay's protection and keeps the team closer. Upgrades carry across all chapters of the current run. Beginning a new journey or refreshing resets campaign progress; there is no campaign save or multiplayer backend in this version.
 
-## Development in the cloud workspace
+## Hosting and updates
 
-Use `/workspace/Games`, the existing isolated checkout. A separate Git worktree is unnecessary.
+The source repository is https://github.com/yamehta93-creator/Games . If Netlify is connected to its `main` branch, pushing changes triggers deployment to your existing site address. Netlify must finish its build before refreshing shows the new version. This repository cannot determine the URL of your connected Netlify project.
+
+- **Netlify**: build `npm run build`, publish `dist`; `netlify.toml` is included.
+- **Vercel**: import the repository, select Vite, build `npm run build`, output `dist`; `vercel.json` is included.
+- **GitHub Pages**: prebuilt files are committed in `docs`. Configure Pages to deploy `main` → `/docs`. Rebuild and refresh `docs` before pushing future releases.
+- The 3D adventure is at the site root; the original arcade game is at `/arcade.html` (or `/Games/arcade.html` on GitHub Pages).
+- All visual models/scenery are original procedural meshes; sound is synthesized locally. The 3D adventure has no external asset/CDN requests and requires WebGL 2, supported by current Chrome, Edge, Firefox, and Safari. On devices without WebGL, the error screen links to the Canvas arcade game.
+- A public game link can be shared directly. Source privacy is separate from website accessibility.
+
+This is a compact three-chapter single-player campaign, not a commercial-scale open-world game. It uses deterministic companion behavior, not an external AI service. The cartoon names and inspiration are referenced as a fan project; artwork, models, villains, and level layouts are original. This is an unofficial fan prototype, not affiliated with the cartoon’s creators.
+
+## Cloud development
+
+Use the existing isolated checkout at `/workspace/Games`; no separate Git worktree is needed.
 
 ```
 npm ci
 npm run dev
 npm test
 npm run build
+npm run preview
 ```
 
-`npm run preview` serves the production output. `npm test` runs nine rules and simulation tests covering progression, score chains, collision detection, damage protection, game over, dash cooldown, and pausing. `node tests/browser.mjs` exercises desktop and mobile behavior against the dev server using system Chromium at `/usr/bin/chromium`; browser verification needs a machine allowed to launch a browser and access the server. Screenshots go to `/tmp`.
+The Vite build emits both game entry points. `npm test` exercises the arcade and adventure systems, including team upgrades, AI attacks, invulnerability, revivals, chapter transitions, and final victory. Browser checks require system Chromium at `/usr/bin/chromium` and a running dev server:
 
-The production `dist` directory is a static website. No server-side runtime is required. Visuals are drawn procedurally and sounds use Web Audio, with no third-party game assets. Google Fonts are optional; system fonts provide fallback if unavailable.
+```
+npm run test:adventure
+npm run test:browser
+```
+
+Screenshots are written to `/tmp`. Three.js visuals use real WebGL rendering; the test browser enables software rendering for GPU-less cloud machines. No credentials, backend service, or paid AI API is required.

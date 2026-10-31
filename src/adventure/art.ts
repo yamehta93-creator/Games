@@ -1,0 +1,37 @@
+import * as T from 'three';
+export const material=(color:T.ColorRepresentation,extra:T.MeshStandardMaterialParameters={})=>new T.MeshStandardMaterial({color,roughness:.85,...extra});
+export function mesh(geometry:T.BufferGeometry,color:T.ColorRepresentation,parent:T.Object3D,x=0,y=0,z=0,extra:T.MeshStandardMaterialParameters={}){const m=new T.Mesh(geometry,material(color,extra));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+export function box(parent:T.Object3D,color:T.ColorRepresentation,x:number,y:number,z:number,w:number,h:number,d:number){return mesh(new T.BoxGeometry(w,h,d),color,parent,x,y,z);}
+export function sphere(parent:T.Object3D,color:T.ColorRepresentation,x:number,y:number,z:number,r:number){return mesh(new T.SphereGeometry(r,12,9),color,parent,x,y,z);}
+export function cylinder(parent:T.Object3D,color:T.ColorRepresentation,x:number,y:number,z:number,top:number,bottom:number,h:number){return mesh(new T.CylinderGeometry(top,bottom,h,10),color,parent,x,y,z);}
+export function character(index:number,enemy=false,boss=false){const root=new T.Group(),body=new T.Group();root.add(body);const color=enemy?(boss?0x42304e:0x52445c):[0xc53932,0x9e3040,0x368976,0xc7a456][index];
+ const skin=enemy?0xa2a2af:index===0?0xf1cd55:0xe6b288;
+ const robe=cylinder(body,color,0,.95,0,.4,.5,.9);robe.name='robe';
+ cylinder(body,enemy?0x202a38:0xf1cf87,0,.65,0,.43,.43,.1);
+ const head=sphere(body,skin,0,1.83,0,index===0&&!enemy?.53:.42);head.name="head";root.userData.hero=!enemy;
+ if(!enemy&&index!==0){sphere(body,index===2?0x482c25:0x241f28,0,2.04,-.08,.43);if(index===1){sphere(body,0x201e24,-.43,2.09,-.05,.2);sphere(body,0x201e24,.43,2.09,-.05,.2);}if(index===3){cylinder(body,0x66452c,0,2.23,0,.63,.63,.08);cylinder(body,0x66452c,0,2.34,0,.31,.4,.22);}}
+ if(enemy){head.scale.set(1,.85,1);box(body,0x20202c,0,1.84,.36,.6,.22,.12);if(boss){for(const side of [-1,1]){const horn=mesh(new T.ConeGeometry(.15,.8,5),0xd8ba73,body,side*.36,2.3,0);horn.rotation.z=-side*.5;}}}
+ for(const side of [-1,1]){sphere(body,enemy?0xfe6868:0x2d292a,side*.17,1.88,.39,.045);const arm=new T.Group();arm.position.set(side*.5,1.25,0);cylinder(arm,color,0,-.18,0,.13,.14,.55);sphere(arm,skin,0,-.48,0,.14);arm.name=side<0?'leftArm':'rightArm';body.add(arm);const leg=cylinder(body,0x302c33,side*.2,.29,0,.13,.15,.5);leg.name=side<0?'leftLeg':'rightLeg';box(body,0x24252d,side*.2,.07,.1,.29,.17,.42);}
+ if(index===0&&!enemy){for(let i=0;i<9;i++){const a=i/8*Math.PI; sphere(body,0x55452c,Math.cos(a)*.3,1.4-Math.sin(a)*.12,.3,.055);}for(let i=0;i<6;i++)sphere(body,0x775e32,(i%3-1)*.11,2.06+Math.floor(i/3)*.1,.43,.026);}
+ const shadow=mesh(new T.CircleGeometry(.58,24),0x102e2c,root,0,.025,0,{transparent:true,opacity:.22,depthWrite:false});shadow.rotation.x=-Math.PI/2;shadow.castShadow=false;
+ if(boss)root.scale.setScalar(2.15);return root;}
+export function animateCharacter(root:T.Group,time:number,moving:boolean,attack:number,adult:boolean){const body=root.children[0];body.scale.setScalar(adult?1.3:1);if(root.userData.hero){const head=body.getObjectByName('head');if(head)head.scale.setScalar(adult?.88:1);}body.position.y=moving?Math.abs(Math.sin(time*11))*.09:Math.sin(time*2)*.025;for(const name of ['leftArm','rightArm','leftLeg','rightLeg']){const part=body.getObjectByName(name);if(part){part.rotation.x=moving?Math.sin(time*11+(name.startsWith('left')?0:Math.PI))*.55:0;if(attack>0&&name.endsWith('Arm'))part.rotation.x=-1.2-Math.sin(attack*20)*.7;}}}
+function tree(parent:T.Object3D,x:number,z:number,pink:boolean,size=1){const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(size);parent.add(g);cylinder(g,0x685442,0,1.6,0,.15,.3,3.2);if(pink){for(let i=0;i<5;i++){const a=i*2.4;sphere(g,[0xeab6bd,0xe8a3b7,0xf0c7c3][i%3],Math.sin(a)*1.1,3.2+Math.cos(a)*.4,Math.cos(a)*.9,1.35);}}else{for(let i=0;i<3;i++)mesh(new T.ConeGeometry(1.7-i*.35,2.5,7),[0x4f8067,0x639477,0x76a080][i],g,0,2.5+i*.8,0);}}
+function gate(parent:T.Object3D,x:number,z:number){const g=new T.Group();g.position.set(x,0,z);parent.add(g);for(const side of [-1,1]){cylinder(g,0x9b483e,side*3.4,2.8,0,.23,.32,5.6);box(g,0x713a33,side*3.4,.4,0,.8,.8,.8);}box(g,0xad5144,0,4.8,0,8.6,.35,.5);box(g,0x273b3a,0,5.7,0,9.8,.35,.8);box(g,0xad5144,0,5.4,0,9.2,.35,.6);box(g,0xd5b677,0,5,0,.6,1.2,.12);}
+function lantern(parent:T.Object3D,x:number,z:number){const g=new T.Group();g.position.set(x,0,z);parent.add(g);cylinder(g,0x6d7970,0,.25,0,.5,.6,.5);cylinder(g,0x8d9990,0,.9,0,.2,.3,1.2);box(g,0xeacd86,0,1.7,0,.65,.65,.65);mesh(new T.ConeGeometry(.65,.4,4),0x516b64,g,0,2.18,0);}
+function temple(parent:T.Object3D,x:number,z:number){const g=new T.Group();g.position.set(x,0,z);parent.add(g);box(g,0x7a8e81,0,.35,0,12,.7,8);box(g,0xcca778,0,2,0,10,3,6);for(let i=-4;i<=4;i+=2)box(g,0x833e35,i,2.2,3.1,.25,3.2,.3);box(g,0x512f29,0,1.8,3.15,2,2.8,.15);for(let j=0;j<2;j++){const roof=mesh(new T.ConeGeometry(8-j*1.7,2,4),0x3e6661,g,0,4.5+j*1.7,0);roof.rotation.y=Math.PI/4;roof.scale.z=.75;box(g,0x9e5944,0,4.8+j*1.7,0,7-j*2,1,4-j);}}
+export function world(chapter:number){const root=new T.Group();const earth=[0x8caa86,0xac9072,0x777f9d][chapter],grass=[0x8bb494,0xb69876,0x7d8b9f][chapter];
+ box(root,earth,0,-1.2,0,65,2.4,90);const ground=mesh(new T.PlaneGeometry(65,90),grass,root,0,.01,0);ground.rotation.x=-Math.PI/2;
+ box(root,0xb5b5a0,0,.03,0,8,.06,65);for(let i=0;i<24;i++){const tile=box(root,[0xc6c6af,0xb7bba5,0xd0cdb4][i%3],(i%2?2:-2),.08,29-i*2.6,3.6,.1,2.3);tile.rotation.y=Math.sin(i)*.045;}
+ // A river, bridges, and stone banks frame the pilgrimage route.
+ box(root,0x5b9f9d,-18,-.02,-1,7,.18,85);for(let i=0;i<28;i++){const rock=mesh(new T.DodecahedronGeometry(.7+(i%3)*.3),0x7f958c,root,-13.9+Math.sin(i)*.4,.2,39-i*3);rock.scale.y=.65;}
+ for(const z of [17,-14]){box(root,0xad9973,-17,.3,z,10,.5,3);for(const x of [-21,-13])box(root,0x6f5945,x,1,z,.2,1.5,3.7);}
+ gate(root,0,18);gate(root,0,-18);temple(root,0,-39);lantern(root,-5,15);lantern(root,5,15);lantern(root,-5,-20);lantern(root,5,-20);
+ for(let i=0;i<65;i++){const side=i%2?1:-1;const x=side*(9+(i*7.31%17));const z=-40+(i*13.17%80);tree(root,x,z,i%4===0||chapter===2,.65+(i%5)*.14);}
+ for(let i=0;i<18;i++){const g=mesh(new T.IcosahedronGeometry(3+i%5,0),[0x71958c,0x668b86,0x84a79b][i%3],root,(i%2?1:-1)*(35+i%4*4),2,-47+i*7);g.scale.set(1,2+(i%3),1.4);}
+ // Grass tufts and flowers are seeded deterministically, leaving the central path clear.
+ for(let i=0;i<110;i++){const x=Math.sin(i*77)*29,z=Math.cos(i*31)*40;if(Math.abs(x)<5||x<-14&&x>-22)continue;const tuft=mesh(new T.ConeGeometry(.18,.65,3),i%7===0?0xf4d8af:0x6e9a78,root,x,.25,z);tuft.rotation.z=Math.sin(i)*.2;}
+ for(let i=0;i<6;i++){const a=i*Math.PI/3;const pillar=cylinder(root,0x73887f,Math.cos(a)*8,.7,-28+Math.sin(a)*8,.45,.65,1.4);if(chapter===2)pillar.scale.y=2;}
+ const portal=new T.Group();portal.position.set(0,2.2,-31);root.add(portal);const ring=mesh(new T.TorusGeometry(2,.16,8,48),0xe6c275,portal,0,0,0,{emissive:0xc08b38,emissiveIntensity:.5});ring.name='gateRing';const inside=mesh(new T.CircleGeometry(1.84,48),0x79ccba,portal,0,0,0,{transparent:true,opacity:.45,side:T.DoubleSide,emissive:0x64bcaa,emissiveIntensity:.6});inside.name='gateInside';portal.name='portal';
+ return root;}
+export function disposeTree(root:T.Object3D){root.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});}
