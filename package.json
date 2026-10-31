@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "test:browser": "node tests/browser.mjs",
-    "test:adventure": "node tests/adventure-browser.mjs"
+    "test:adventure": "node tests/rain-browser.mjs",
+    "test:courtyard": "node tests/solo-browser.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

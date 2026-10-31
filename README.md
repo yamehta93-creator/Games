@@ -1,32 +1,35 @@
-# Omi — solo water guardian
+# Omi · The Rainfall Shrine
 
-The current adventure focuses on one human child monk inspired by Omi. The three companions, companion AI, formation controls, species selector, and group upgrade UI have been removed from active play. The earlier versions remain in Git history. Lumen Drift remains at `arcade.html`.
-
-## Current visual scope
-
-The human has revised child proportions, smaller eyes, a modeled nose, eyelids, ears and lips. Water streams use reflective physical materials; the scene uses environment reflections, filmic output, and restrained bloom. Choose **Inspect Omi & preview water** on the title screen for a close view. This is still a procedural browser prototype. It does **not** meet PS4 Spider-Man/FIFA character or environment fidelity. That target needs professionally authored and rigged character models, detailed PBR textures, authored animation, environment assets, and further art/optimization work. No soldier model or other mismatched stock character has been substituted for the child monk.
+A reference-inspired, rain-soaked **2.5D side-scrolling adventure**. The main page now uses an original painted forest environment, an illustrated human child monk, glowing mushrooms, fern layers, moving rain, mossy floating platforms and visible water streams. The world is rendered with Three.js: layered artwork and character planes sit alongside mesh ledges, mushrooms, enemies and water geometry. The environment painting is a generated original image, included locally at `public/art/rainfall-shrine.png`; the human character is drawn procedurally. The reference's masked character has not been copied.
 
 ## Play
 
-- WASD / arrows: move.
-- Hold J / Strike: attack nearby enemies.
-- E / Water surge: freeze nearby enemies and restore health.
-- Space / Dodge: brief invulnerability and fast movement.
-- U / Upgrade Omi: improve damage, health, or mastery.
-- P / Escape: pause.
-- Mobile: virtual stick and on-screen action buttons.
+Choose **Enter the rain**.
 
-Defeat each chapter's raiders and boss, then walk into the spirit gate at the north end of the path. Three chapters retain your upgrades and end in a final showdown. Enemy counts and boss health have been reduced for solo combat; health and surge healing have been increased. Refreshing or beginning a new journey resets campaign progress.
+- **A / D or left / right arrows**: move.
+- **Space / W / up arrow**: jump. Run and jump to cross gaps.
+- **Hold J**: cast water projectiles.
+- **E**: large water surge; also restores a little health.
+- **Shift**: dodge dash with brief damage protection.
+- **P / Escape**: pause. Losing browser focus also pauses.
+- **Phone / tablet**: left/right movement buttons and on-screen Jump, Water, Surge and Dash controls.
 
-## Hosting
+Cross the Lantern Woods, reach the Moss Shrine checkpoint, then defeat the Rain Warden and enter the light at the far right. Collect spirit shards for healing; every four shards attune stronger water attacks. Enemy defeats award additional shards. The two checkpoints restore health; falling into a gap returns you to the last checkpoint and costs health. Omi is the only player character; there are no AI companions. This is a compact single-player level with three regions, not the old chapter-based team campaign. Progress resets on refresh or restart.
 
-Netlify/Vercel: build `npm run build`, publish `dist`. GitHub Pages: publish `main` / `docs` (prebuilt output). Your hosting project must be linked to `yamehta93-creator/Games`, production branch `main`, for pushes here to redeploy it. Deployment on your Netlify account cannot be confirmed by this workspace.
+## Other games
 
-A prebuilt ZIP is at [release/legends-of-the-elements-web.zip](https://github.com/yamehta93-creator/Games/raw/refs/heads/main/release/legends-of-the-elements-web.zip). Download, extract, and upload the folder containing `index.html` to your project's manual deployment area if needed. No local developer tools are required.
+- `courtyard.html`: the earlier solo 3D courtyard prototype, retained for comparison.
+- `arcade.html`: Lumen Drift.
 
-## Development
+## Host without installing developer tools
 
-Use the existing isolated checkout `/workspace/Games`; do not create a separate worktree unless requested.
+If Netlify is connected to `yamehta93-creator/Games`, production branch `main`, pushes here trigger a new deployment. Build command: `npm run build`; publish directory: `dist`. The cloud workspace cannot confirm deployment on your Netlify account.
+
+For manual hosting, [download the website ZIP](https://github.com/yamehta93-creator/Games/raw/refs/heads/main/release/legends-of-the-elements-web.zip), extract it, and upload the folder containing `index.html` to your Netlify project's Deploys page. All images are included. The same ZIP works with ordinary static hosting. Vercel configuration is included. GitHub Pages can serve the prebuilt `docs` directory from `main` → `/docs`.
+
+## Cloud development
+
+Use the existing isolated `/workspace/Games` checkout. No separate worktree is needed.
 
 ```
 npm ci
@@ -36,4 +39,11 @@ npm run build
 npm run preview
 ```
 
-With the preview server on port 4173, run `npm run test:adventure` to verify the solo human, water rendering, mobile layout, upgrades and campaign entry using system Chromium. `npm run test:browser` checks the retained arcade game against the dev server on port 5173. Tests use software rendering on this cloud machine and should run sequentially.
+With the preview server running on port 4173:
+
+```
+npm run test:adventure
+npm run test:courtyard
+```
+
+The new adventure tests cover every required platform gap, falling, landing, region progression, water damage, cooldowns, healing, checkpoint recovery, defeat, and boss/gate victory conditions. Desktop/mobile browser checks verify image loading, start, jumping, water attacks, pause/resume and responsive layout. They require system Chromium at `/usr/bin/chromium` and use software rendering in this cloud environment. The retained arcade browser check (`npm run test:browser`) uses the dev server on port 5173.
