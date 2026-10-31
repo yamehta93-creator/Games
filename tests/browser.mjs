@@ -1,0 +1,12 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const page=await browser.newPage({viewport:{width:1440,height:1200}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:5173');await page.getByRole('button',{name:'Start drifting'}).click();
+await page.keyboard.down('ArrowRight');await page.waitForTimeout(300);await page.keyboard.up('ArrowRight');await page.keyboard.press('Space');await page.getByText('RECHARGING',{exact:true}).waitFor();
+await page.keyboard.press('p');await page.getByRole('heading',{name:'Drift suspended.'}).waitFor();await page.getByRole('button',{name:'Resume drifting'}).click();
+await page.screenshot({path:'/tmp/lumen-desktop.png',fullPage:true});
+await page.getByRole('button',{name:'Mute sound'}).click();await page.getByRole('button',{name:'Unmute sound'}).waitFor();
+await page.getByRole('button',{name:'Drift again'}).waitFor({timeout:60000});await page.getByRole('button',{name:'Drift again'}).click();await page.getByText('LIVE SESSION',{exact:true}).waitFor();
+assert.equal(await page.locator('.hud-score strong').innerText(),'00000');
+const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});mobile.on('pageerror',e=>errors.push(e.message));await mobile.goto('http://127.0.0.1:5173');await mobile.getByRole('button',{name:'Start drifting'}).tap();const canvas=mobile.locator('canvas');const box=await canvas.boundingBox();await mobile.touchscreen.tap(box.x+box.width*.7,box.y+box.height*.5);await mobile.getByRole('button',{name:'ϟ DASH',exact:true}).tap();await mobile.getByText('RECHARGING',{exact:true}).waitFor();await mobile.screenshot({path:'/tmp/lumen-mobile.png',fullPage:true});assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);console.log('Browser checks passed: start, keyboard movement, dash, pause/resume, sound toggle, natural game over, restart, touch input, mobile layout; no runtime errors.');await browser.close();
