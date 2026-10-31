@@ -1,11 +1,6 @@
 import * as T from 'three';
 
-export const GUARDIANS = [
- {name:'Omi',species:'Human',element:'Water',color:'#81ddff',title:'Keeper of the flowing tide',description:'A young human monk with an unshakable spirit. His water ribbons rise into a sweeping tidal surge.'},
- {name:'Kimi',species:'Lizard',element:'Fire',color:'#ffad69',title:'Heart of the living flame',description:'A quick-footed lizard with a golden crest and an ember-red cloak. Her fire blossoms scorch groups of foes.'},
- {name:'Raimundo',species:'Dragon',element:'Wind',color:'#9ef5d1',title:'Wings of the wandering sky',description:'An emerald dragon with luminous wing membranes and sweeping horns. His spiraling wind restores his allies.'},
- {name:'Clay',species:'Cat',element:'Earth',color:'#f3d58f',title:'The mountain with a gentle heart',description:'A sturdy tabby cat with bright eyes and a curling tail. Stone pillars rise at his command to shelter the team.'},
-] as const;
+export const GUARDIANS = [{name:'Omi',species:'Human',element:'Water',color:'#81ddff',title:'The way of living water',description:'A human child monk learning to master the tide. Study his water technique here, then test it in the monastery trials.'}] as const;
 function mat(color:T.ColorRepresentation,roughness=.48,metalness=0){return new T.MeshStandardMaterial({color,roughness,metalness});}
 function add(parent:T.Object3D,geometry:T.BufferGeometry,color:T.ColorRepresentation,x=0,y=0,z=0){const m=new T.Mesh(geometry,mat(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
 function orb(p:T.Object3D,c:T.ColorRepresentation,x:number,y:number,z:number,rx:number,ry=rx,rz=rx){const m=add(p,new T.SphereGeometry(1,24,16),c,x,y,z);m.scale.set(rx,ry,rz);return m;}
@@ -18,18 +13,26 @@ function clothing(body:T.Group,color:number,trim:number,index:number){
  rod(body,trim,0,.77,0,.47,.49,.09);rod(body,0x503d36,0,1.1,0,.43,.43,.11);orb(body,trim,0,1.1,.43,.1,.12,.045);
  line(body,trim,[[-.29,1.48,.25],[-.1,1.3,.41],[.17,1.16,.42]],.035);
  if(index===0){const sash=add(body,new T.BoxGeometry(.19,.57,.045),0xe6a54d,.16,.75,.43);sash.rotation.z=.1;}
- for(const side of [-1,1]){const arm=new T.Group();arm.position.set(side*.46,1.46,0);body.add(arm);arm.name=side<0?'leftArm':'rightArm';orb(arm,color,0,-.11,0,.18,.26,.19);rod(arm,trim,0,-.33,0,.16,.155,.1);const skin=[0xe9b985,0x79a662,0x529f99,0xd69b58][index];orb(arm,skin,0,-.51,.04,.13,.2,.14);rod(arm,index===2?0x315e60:0x5c4b3f,0,-.52,0,.14,.14,.17);orb(arm,skin,0,-.7,.05,.14,.14,.13);
+ for(const side of [-1,1]){const arm=new T.Group();arm.position.set(side*.46,1.46,0);body.add(arm);arm.name=side<0?'leftArm':'rightArm';orb(arm,color,0,-.11,0,.15,.24,.16);rod(arm,trim,0,-.33,0,.16,.155,.1);const skin=[0xe9b985,0x79a662,0x529f99,0xd69b58][index];orb(arm,skin,0,-.51,.04,.13,.2,.14);rod(arm,index===2?0x315e60:0x5c4b3f,0,-.52,0,.14,.14,.17);orb(arm,skin,0,-.7,.05,.14,.14,.13);
  const leg=new T.Group();leg.name=side<0?'leftLeg':'rightLeg';leg.position.set(side*.21,.6,0);body.add(leg);orb(leg,0x394444,0,-.19,0,.145,.27,.15);orb(leg,index===3?0xdfbc8c:0x333d3c,0,-.48,.12,.18,.16,.31);rod(leg,trim,0,-.31,0,.15,.15,.07);}
 }
 function wing(body:T.Group,side:number){const rig=new T.Group();rig.name=side<0?'leftWing':'rightWing';rig.position.set(side*.3,1.48,-.2);body.add(rig);
  const v=[[0,0,0],[side*.7,1.5,-.65],[side*1.72,.65,-.45],[side*1.38,-.1,-.24],[side*.83,.12,-.2],[side*.5,-.45,-.08]];
  const vertices:number[]=[];for(let i=1;i<v.length-1;i++)vertices.push(...v[0],...v[i],...v[i+1]);const membrane=triangle(rig,0x6dc9ba,vertices);(membrane.material as T.MeshStandardMaterial).roughness=.32;(membrane.material as T.MeshStandardMaterial).emissive.set(0x103f3a);(membrane.material as T.MeshStandardMaterial).emissiveIntensity=.35;
  line(rig,0x2b746d,[v[0],v[1],v[2],v[3]],.055);for(const i of [2,3,5])line(rig,0xc2d9ad,[v[0],v[i]],.024);}
-export function guardian(index:number){const root=new T.Group(),body=new T.Group();root.add(body);root.userData.hero=true;root.userData.species=GUARDIANS[index].species;
+export function guardian(index:number){const root=new T.Group(),body=new T.Group();root.add(body);root.userData.hero=true;root.userData.species='Human';root.userData.headScale=.72;
  const robes=[0xac3539,0xa9402e,0x294e61,0x716141],trims=[0xe6bb66,0xe8bc61,0xb5dec5,0xd3b16c];clothing(body,robes[index],trims[index],index);
- rod(body,[0xe9b985,0x79a662,0x529f99,0xd69b58][index],0,1.62,0,.18,.2,.36);const head=new T.Group();head.name='head';head.position.set(0,2,0);body.add(head);
- if(index===0){orb(head,0xf0c291,0,.08,0,.47,.53,.43);for(const side of [-1,1]){orb(head,0xe6b180,side*.46,.02,0,.11,.17,.09);eye(head,side*.17,.08,.37,false,0x765137);line(head,0x6b4936,[[side*.08,.27,.39],[side*.17,.3,.4],[side*.27,.25,.34]],.025);}orb(head,0xdba06e,0,-.045,.42,.065,.09,.08);line(head,0x925542,[[-.1,-.2,.37],[0,-.22,.4],[.1,-.2,.37]],.015);for(let i=0;i<6;i++)orb(head,0xa67b45,(i%3-1)*.1,.36+Math.floor(i/3)*.09,.36,.021,.022,.014);
- for(let i=0;i<11;i++){const a=i/10*Math.PI;orb(body,i%2?0x704e32:0xa67b47,Math.cos(a)*.3,1.5-Math.sin(a)*.2,.32+Math.sin(a)*.05,.052);} }
+ rod(body,[0xe9b985,0x79a662,0x529f99,0xd69b58][index],0,1.55,0,.14,.17,.2);const head=new T.Group();head.name='head';head.position.set(0,1.8,0);body.add(head);
+ if(index===0){
+ orb(head,0xd9ad8b,0,.08,0,.38,.48,.32);
+ for(const side of [-1,1]){orb(head,0xc89576,side*.37,.015,0,.075,.12,.06);orb(head,0xb78069,side*.395,.025,.02,.027,.066,.025);
+ orb(head,0xeee2d0,side*.14,.105,.298,.083,.049,.029);orb(head,0x594735,side*.14,.1,.325,.035,.039,.012);orb(head,0x171e1e,side*.14,.1,.336,.017,.025,.009);orb(head,0xfff5df,side*.128,.113,.345,.007);
+ line(head,0x996d54,[[side*.062,.117,.315],[side*.14,.16,.32],[side*.216,.12,.283]],.012);line(head,0x5b4134,[[side*.065,.235,.3],[side*.14,.258,.315],[side*.225,.22,.268]],.018);}
+ orb(head,0xd0a17f,0,.02,.313,.043,.105,.046);orb(head,0xc89576,0,-.045,.355,.063,.045,.055);for(const side of [-1,1])orb(head,0x92654e,side*.037,-.06,.374,.015,.009,.008);
+ line(head,0x9a665b,[[-.078,-.157,.31],[0,-.15,.335],[.078,-.157,.31]],.009);line(head,0xc08c7b,[[-.068,-.169,.31],[0,-.18,.33],[.068,-.169,.31]],.012);
+ for(let i=0;i<6;i++)orb(head,0x94754f,(i%3-1)*.07,.33+Math.floor(i/3)*.075,.255,.014,.017,.008);
+ for(let i=0;i<11;i++){const a=i/10*Math.PI;orb(body,i%2?0x704e32:0xa67b47,Math.cos(a)*.3,1.5-Math.sin(a)*.2,.32+Math.sin(a)*.05,.045);}
+ }
  if(index===1){orb(head,0x76a665,0,.08,-.02,.45,.47,.43);orb(head,0x8dbb73,0,-.12,.34,.37,.22,.36);orb(head,0xcbd99e,0,-.24,.39,.28,.08,.27);for(const side of [-1,1]){eye(head,side*.23,.19,.31,true,0xe9c05d);orb(head,0x436f45,side*.17,-.06,.65,.035,.025,.015);for(let j=0;j<3;j++)orb(head,0x527e48,side*(.33+j*.02),-.04+j*.13,.29,.055,.04,.03);}
  for(let i=0;i<5;i++){const crest=add(head,new T.ConeGeometry(.11,.3-i*.015,5),0xe0b955,0,.49-i*.08,-.28+i*.09);crest.rotation.x=-.25;}
  line(body,0x6f9c58,[[0,.8,-.25],[.22,.6,-.7],[.52,.42,-1.2],[.6,.57,-1.55],[.37,.74,-1.7]],.145).name='tail';for(let i=0;i<4;i++)orb(body,0xc8b75a,i*.12,.73-i*.045,-.55-i*.23,.065,.12,.065);line(head,0x416f49,[[-.23,-.17,.61],[0,-.2,.67],[.23,-.17,.61]],.012);}
